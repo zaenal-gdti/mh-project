@@ -95,7 +95,7 @@ def join_pdfs(mh_fls, mcu_fls):
 
 
 
-            passw = pd.to_datetime(base_nm.split('_')[1]).strftime('%d-%m-%Y') #.replace('.pdf', '')
+            passw = pd.to_datetime(base_nm.split('_')[1]).strftime('%d%m%Y') #.replace('.pdf', '')
             # new_fname = '_'.join(pdf_file.split('_')[:-1]) + '.pdf'
             # new_fname = out_path + os.path.basename(new_fname)
             for page in reader.pages:
