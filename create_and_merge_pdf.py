@@ -13,6 +13,7 @@ from pypdf import PdfWriter
 import os
 from datetime import datetime
 import shutil
+import PyPDF2 as p2
 
 def create_pdf_from_excel(df, dir_nm):
     if os.path.exists(dir_nm):
@@ -83,11 +84,30 @@ def join_pdfs(mh_fls, mcu_fls):
             fold = '/'.join(i.split('/')[:-2]) + '/Result/' 
             if not os.path.exists(fold):
                 os.makedirs(fold)
-            res = fold + base_nm
+            res = fold +'tmp__'+base_nm
             if os.path.exists(res):
                 os.remove(res)
             merger.write(res)
             merger.close()
+
+            reader = p2.PdfReader(res)
+            writer = p2.PdfWriter()
+
+
+
+            passw = pd.to_datetime(base_nm.split('_')[2]).strftime('%d-%m-%Y') #.replace('.pdf', '')
+            # new_fname = '_'.join(pdf_file.split('_')[:-1]) + '.pdf'
+            # new_fname = out_path + os.path.basename(new_fname)
+            for page in reader.pages:
+                writer.add_page(page)
+
+            # Set password (user password)
+            writer.encrypt(user_password=passw)
+
+            with open(res.replace('tmp__',''), "wb") as f:
+                writer.write(f)   
+            os.remove(res)
+
         except:
             if not loc_files:
                 print("MCU file not found ==>,", base_nm)
