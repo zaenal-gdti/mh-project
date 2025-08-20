@@ -1,3 +1,19 @@
+from docx import Document
+from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+import subprocess
+import pandas as pd
+import numpy as np
+import os
+import shutil
+from tqdm import tqdm
+import glob
+from zipfile import ZipFile 
+from pypdf import PdfWriter
+import os
+from datetime import datetime
+import shutil
+
 def create_pdf_from_excel(df, dir_nm):
     if os.path.exists(dir_nm):
         shutil.rmtree(dir_nm)
