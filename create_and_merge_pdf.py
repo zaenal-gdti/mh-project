@@ -112,5 +112,5 @@ def join_pdfs(mh_fls, mcu_fls):
             os.remove(res)
 
         except:
-            print("Error merging files for ==>", base_nm)
+            pass
     
