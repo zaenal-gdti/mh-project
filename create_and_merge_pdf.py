@@ -74,6 +74,9 @@ def join_pdfs(mh_fls, mcu_fls):
     for i in tqdm(mh_fls):
         loc_files = [x for x in mcu_fls if os.path.basename(x).split('_')[:2] == os.path.basename(i).split('_')[:2]]
         try: 
+            if len(loc_files) == 0:
+                print("MCU file not found ==> ", os.path.basename(i))
+                raise FileNotFoundError("MCU file not found")
             if loc_files:
                 pdfs = [loc_files[0], i]
                 merger = PdfWriter()
@@ -109,8 +112,5 @@ def join_pdfs(mh_fls, mcu_fls):
             os.remove(res)
 
         except:
-            if not loc_files:
-                print("MCU file not found ==>,", base_nm)
-            else:
-                print("Error merging files for ==>", base_nm)
+            print("Error merging files for ==>", base_nm)
     
