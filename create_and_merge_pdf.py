@@ -75,7 +75,7 @@ def join_pdfs(mh_fls, mcu_fls):
         loc_files = [x for x in mcu_fls if os.path.basename(x).split('_')[:2] == os.path.basename(i).split('_')[:2]]
         try: 
             if loc_files:
-                pdfs = [i, loc_files[0]]
+                pdfs = [loc_files[0], i]
                 merger = PdfWriter()
 
             for pdf in pdfs:
