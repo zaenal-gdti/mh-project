@@ -72,7 +72,7 @@ def create_pdf_from_excel(df, dir_nm):
 
 def join_pdfs(mh_fls, mcu_fls):
     for i in tqdm(mh_fls):
-        loc_files = [x for x in mcu_fls if os.path.basename(x).split('_')[:2] == os.path.basename(i).split('_')[:2]]
+        loc_files = [x for x in mcu_fls if os.path.basename(x.lower()).split('_')[:2] == os.path.basename(i.lower()).split('_')[:2]]
         try: 
             if len(loc_files) == 0:
                 print("MCU file not found ==> ", os.path.basename(i))
