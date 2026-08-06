@@ -14,6 +14,10 @@ Options:
     --opacity FLOAT     Watermark opacity, 0.0 (invisible) - 1.0 (fully opaque).
                          Default: 0.15
     --rotate DEGREES    Rotation angle in degrees (counter-clockwise). Default: 0
+    --position PT       Vertical offset from center, in points. Default: 0
+                         0   = vertically centered
+                         >0  = shifted toward the top of the page
+                         <0  = shifted toward the bottom of the page
 
 Examples:
     # Default: logo at 50% of page width, 15% opacity, centered
@@ -24,6 +28,12 @@ Examples:
 
     # Exact width in points, rotated 45 degrees
     python watermark_pdf.py report.pdf logo.png out.pdf --width 200 --rotate 45
+
+    # Shifted 150pt above center
+    python watermark_pdf.py report.pdf logo.png out.pdf --position 150
+
+    # Shifted 100pt below center
+    python watermark_pdf.py report.pdf logo.png out.pdf --position -100
 """
 
 import argparse
@@ -36,7 +46,7 @@ from reportlab.lib.utils import ImageReader
 from PIL import Image
 
 
-def make_watermark_page(logo_path, page_width, page_height, scale, width_pt, opacity, rotate):
+def make_watermark_page(logo_path, page_width, page_height, scale, width_pt, opacity, rotate, position=0):
     """Create a single-page PDF (in-memory) containing the logo centered on
     a page of the given dimensions, at the requested size/opacity/rotation."""
 
@@ -71,8 +81,10 @@ def make_watermark_page(logo_path, page_width, page_height, scale, width_pt, opa
     c = canvas.Canvas(buf, pagesize=(page_width, page_height))
 
     c.saveState()
-    # Move origin to page center, rotate, then draw image centered on that origin
-    c.translate(page_width / 2, page_height / 2)
+    # Move origin to page center (offset vertically by `position`: positive
+    # moves toward the top, negative moves toward the bottom), rotate, then
+    # draw the image centered on that origin
+    c.translate(page_width / 2, page_height / 2 + position)
     if rotate:
         c.rotate(rotate)
     c.drawImage(
@@ -91,7 +103,7 @@ def make_watermark_page(logo_path, page_width, page_height, scale, width_pt, opa
 
 
 def add_watermark(input_pdf, logo_path, output_pdf, scale=0.5, width_pt=None,
-                   opacity=0.15, rotate=0):
+                   opacity=0.15, rotate=0, position=0):
     reader = PdfReader(input_pdf)
     writer = PdfWriter()
 
@@ -106,7 +118,7 @@ def add_watermark(input_pdf, logo_path, output_pdf, scale=0.5, width_pt=None,
 
         if key not in watermark_cache:
             watermark_cache[key] = make_watermark_page(
-                logo_path, pw, ph, scale, width_pt, opacity, rotate
+                logo_path, pw, ph, scale, width_pt, opacity, rotate, position
             )
 
         page.merge_page(watermark_cache[key])
@@ -121,6 +133,9 @@ def add_watermark(input_pdf, logo_path, output_pdf, scale=0.5, width_pt=None,
     print(f"  Opacity: {opacity}")
     if rotate:
         print(f"  Rotation: {rotate}°")
+    if position:
+        direction = "above" if position > 0 else "below"
+        print(f"  Vertical position: {abs(position)}pt {direction} center")
 
 
 def main():
@@ -148,6 +163,11 @@ def main():
         "--rotate", type=float, default=0,
         help="Rotation angle in degrees. Default: 0"
     )
+    parser.add_argument(
+        "--position", type=float, default=0,
+        help="Vertical offset from center in points. 0=centered, "
+             ">0 shifts toward the top, <0 shifts toward the bottom. Default: 0"
+    )
 
     args = parser.parse_args()
 
@@ -164,6 +184,7 @@ def main():
         width_pt=args.width_pt,
         opacity=args.opacity,
         rotate=args.rotate,
+        position=args.position,
     )
 
 
