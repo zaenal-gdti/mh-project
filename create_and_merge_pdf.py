@@ -57,7 +57,7 @@ def create_pdf_from_excel(df, dir_nm):
         doc.tables[1].cell(3,1).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         doc.tables[1].cell(3,2).paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         nm = data['Nama']
-        dob = data['DoB']
+        dob = pd.to_datetime(data['DoB']).strftime('%Y-%m-%d')
         tmp_docx = f'{dir_nm}/{nm}_{dob}_MHResult.docx'
         
         doc.save(tmp_docx)
